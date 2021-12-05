@@ -27,6 +27,7 @@ namespace Blog.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            int i = 0;
             return View();
         }
 
