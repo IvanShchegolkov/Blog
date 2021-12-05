@@ -13,23 +13,20 @@
                     <td>ID</td>
                     <td>Роль</td>
                     <td>Логин</td>
-                    <td>Пароль</td>
                     <td>Имя</td>
                     <td>Фамилия</td>
                     <td>Email</td>
                 </tr>
                 @foreach (var user in Model)
                 {
-                    <tr>
-                        <td>@user.PersonId</td>
-                        <td>@user.PersonRoleId</td>
-                        <td>@user.PersonLogin</td>
-                        <td>@user.PersonPassword</td>
-                        <td>@user.PersonFirstName</td>
-                        <td>@user.PersonLastName</td>
-                        <td>@user.PersonEmail</td>
-                    </tr>
-                }
+        <tr>
+            <td>@user.Id</td>
+            <td>@user.RoleId</td>
+            <td>@user.Login</td>
+            <td>@user.FirstName</td>
+            <td>@user.LastName</td>
+            <td>@user.Email</td>
+        </tr>}
             </table>
         </div>
     </div>

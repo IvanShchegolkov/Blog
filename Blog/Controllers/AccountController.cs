@@ -10,14 +10,16 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Blog.ViewModels;
 using Blog.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Blog.Controllers
 {
     public class AccountController : Controller
     {
-        private PersonContext db;
+        private BlogContext db;
 
-        public AccountController(PersonContext context)
+        public AccountController(BlogContext context)
         {
             db = context;
         }
@@ -34,17 +36,19 @@ namespace Blog.Controllers
         {
             if (ModelState.IsValid)
             {
-                Person person = await db.Person.FirstOrDefaultAsync(u => u.PersonLogin == model.PersonLogin && u.PersonPassword == model.PersonPassword);
+                Person person = await db.Person.FirstOrDefaultAsync(u => 
+                    u.Login == model.PersonLogin && 
+                    u.Password == ComputeHash(model.PersonPassword, new SHA256CryptoServiceProvider()));
                 if (person != null)
                 {
-                    if (person.PersonRoleId != null)
+                    if (person.RoleId != null)
                     {
                         List<Role> roles = await db.Role.ToListAsync();
                         foreach(var role in roles)
                         {
-                            if(role.RoleId == person.PersonRoleId)
+                            if(role.Id == person.RoleId)
                             {
-                                await Authenticate(model.PersonLogin, role.RoleName);
+                                await Authenticate(model.PersonLogin, role.Name);
                             }
                         }
                     }
@@ -69,18 +73,18 @@ namespace Blog.Controllers
         {
             if (ModelState.IsValid)
             {
-                Person person = await db.Person.FirstOrDefaultAsync(u => u.PersonLogin == model.PersonLogin);
+                Person person = await db.Person.FirstOrDefaultAsync(u => u.Login == model.PersonLogin);
                 if (person == null)
                 {
                     // добавляем пользователя в бд
                     db.Person.Add(new Person
                     {
-                        PersonRoleId = 2,
-                        PersonLogin = model.PersonLogin,
-                        PersonPassword = model.PersonPassword,
-                        PersonFirstName = model.PersonFirstName,
-                        PersonLastName = model.PersonLastName,
-                        PersonEmail = model.PersonEmail
+                        RoleId = 2,
+                        Login = model.PersonLogin,
+                        Password = ComputeHash(model.PersonPassword, new SHA256CryptoServiceProvider()),
+                        FirstName = model.PersonFirstName,
+                        LastName = model.PersonLastName,
+                        Email = model.PersonEmail
                     });
                     await db.SaveChangesAsync();
 
@@ -120,6 +124,18 @@ namespace Blog.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Account");
+        }
+
+        public string ComputeHash(string input, HashAlgorithm algorithm)
+        {
+            //string hPassword = ComputeHash(password, new SHA256CryptoServiceProvider());
+            //string hPassword = ComputeHash(password, new MD5CryptoServiceProvider());
+
+            Byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+
+            Byte[] hashedBytes = algorithm.ComputeHash(inputBytes);
+
+            return BitConverter.ToString(hashedBytes);
         }
     }
 }
