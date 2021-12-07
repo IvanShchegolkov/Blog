@@ -30,7 +30,7 @@ namespace Blog.Controllers
 
         //[Authorize]
         public async Task<IActionResult> IndexAsync()
-        {
+        { 
             var PostList = db.Post.ToList();
             for(int i = 0; i < PostList.Count; i++)
             {
