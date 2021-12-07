@@ -55,12 +55,21 @@
                     <li>
                         <a href="~/Home/Index">Блог</a>
                     </li>
-                    <li>
-                        <a href="~/Account/Login">Вход</a>
-                    </li>
-                    <li>
-                        <a href="~/Account/Register">Регистрация</a>
-                    </li>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <li>
+                            <a href="~/Account/Login">Вход</a>
+                        </li>
+                        <li>
+                            <a href="~/Account/Register">Регистрация</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a id="UnAuthorization" href="#">Выход</a>
+                        </li>
+                    }
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -91,6 +100,7 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="~/js/bootstrap.min.js"></script>
     @*<script src="~/angular/Users.js"></script>*@
+    <script src="~/js/main.js"></script>
 
 </body>
 
